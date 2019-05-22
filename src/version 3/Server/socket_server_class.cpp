@@ -72,17 +72,17 @@ void Service_Socket::close_socket(const int& socket){
 }
 
 
-void Service_Socket::generate_name( void ){
-  //Seta os primeiros numeros de bytes de um ponteiro de um bloco de memoria para um valor especifico (Unsigned char), neste caso esta setando 0 NI_MAXHOST
-  memset(this->host, '0', NUM_MAX_HOST);
-  memset(this->service, '0', NUM_MAX_SERV);
+// void Service_Socket::generate_name( void ){
+//   //Seta os primeiros numeros de bytes de um ponteiro de um bloco de memoria para um valor especifico (Unsigned char), neste caso esta setando 0 NI_MAXHOST
+//   memset(this->host, '0', NUM_MAX_HOST);
+//   memset(this->service, '0', NUM_MAX_SERV);
 
-  //Verifica se consegue o nome do host que esta conectado se nao der, usamos o ip_address
+//   //Verifica se consegue o nome do host que esta conectado se nao der, usamos o ip_address
 
-  if(getnameinfo((sockaddr*)&this->client, sizeof(this->client), this->host, NUM_MAX_HOST, this->service, NUM_MAX_SERV, 0) == 0){
-    cout << this->host << " conectado na porta: " << this->service << endl; // possivel nome
-  }else{
-    inet_ntop(ADDR_FAMILY,&this->client.sin_addr, this->host, NUM_MAX_HOST); //Gera o endereco IP da porta
-    cout << this->host << "conectado na porta " << ntohs(this->client.sin_port) << endl;
-  }
-}
+//   if(getnameinfo((sockaddr*)&this->client, sizeof(this->client), this->host, NUM_MAX_HOST, this->service, NUM_MAX_SERV, 0) == 0){
+//     cout << this->host << " conectado na porta: " << this->service << endl; // possivel nome
+//   }else{
+//     inet_ntop(ADDR_FAMILY,&this->client.sin_addr, this->host, NUM_MAX_HOST); //Gera o endereco IP da porta
+//     cout << this->host << "conectado na porta " << ntohs(this->client.sin_port) << endl;
+//   }
+// }
