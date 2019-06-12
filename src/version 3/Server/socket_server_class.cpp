@@ -32,7 +32,6 @@ int Service_Socket::listening_socket ( const int port ){
   SOCKET clientSocket = INVALID_SOCKET;
 
   while(LISTENING){
-
     if(clientCounter == NUM_PORT && port == PORT){
       std::cerr << "BREAKING" << '\n';
       break;
@@ -59,10 +58,11 @@ int Service_Socket::handle_connection( const int clientSocket ){
       return FAILED;
     if(bytes_rcv == 0){
       cout << "Cliente desconectado" << endl;
+      std::cout << "\nWAITING FOR CONNECTION. . .\n";
       break;
     }
-    std::cout << "Message: " << buffer << endl;
-    send(clientSocket, buffer, bytes_rcv+1, 0);    //Mensagem de volta para o cliente, com o \0
+    std::cout << "Message: " << buffer << bytes_rcv << endl;
+    send(clientSocket, "Chegou", bytes_rcv+1, 0);    //Mensagem de volta para o cliente, com o \0
   }
   return SUCESS;
 }
@@ -71,14 +71,14 @@ void Service_Socket::close_socket(const int& socket){
   close(socket);
 }
 
-
+//
 // void Service_Socket::generate_name( void ){
 //   //Seta os primeiros numeros de bytes de um ponteiro de um bloco de memoria para um valor especifico (Unsigned char), neste caso esta setando 0 NI_MAXHOST
 //   memset(this->host, '0', NUM_MAX_HOST);
 //   memset(this->service, '0', NUM_MAX_SERV);
-
+//
 //   //Verifica se consegue o nome do host que esta conectado se nao der, usamos o ip_address
-
+//
 //   if(getnameinfo((sockaddr*)&this->client, sizeof(this->client), this->host, NUM_MAX_HOST, this->service, NUM_MAX_SERV, 0) == 0){
 //     cout << this->host << " conectado na porta: " << this->service << endl; // possivel nome
 //   }else{

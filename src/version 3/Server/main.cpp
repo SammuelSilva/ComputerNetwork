@@ -5,6 +5,7 @@ bool run_socket(int port);
 
 int main(int argc, char const *argv[]) {
   vector<thread> portThreads;
+  std::cout << "WAITING FOR CONNECTION. . .\n";
 
 	for (int i = 0; i <= NUM_PORT; i++)
 	{
@@ -20,6 +21,5 @@ int main(int argc, char const *argv[]) {
 
 bool run_socket(int port){
     Service_Socket *server = new Service_Socket();
-
     return server->run_socket(port);
 }

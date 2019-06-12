@@ -27,7 +27,7 @@
 #define NUM_MAX_HOST     NI_MAXHOST //Number max of hosts
 #define NUM_MAX_SERV     NI_MAXSERV //Number max of service
 #define LISTENING        true
-#define NUM_PORT         5
+#define NUM_PORT         22
 
 using std::cin;
 using std::cout;

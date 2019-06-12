@@ -9,7 +9,7 @@ private:
   SOCKET listening;
   char host[NI_MAXHOST];
   char service[NI_MAXSERV];
-  
+
   virtual int handle_connection( const int );
 
 public:

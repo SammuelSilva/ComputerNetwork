@@ -16,7 +16,7 @@ public:
   virtual int create_socket( void );
   virtual int initialize_socket( void );
   virtual int connect_socket( void );
-  virtual void send_data( void );
+  virtual int send_data( void );
   virtual int receive_data( void );
 
 };

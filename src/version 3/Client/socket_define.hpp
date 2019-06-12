@@ -16,9 +16,15 @@
 #define MAXCONECTION     SOMAXCONN // SOMAXCONN: Numero maximo de conexões
 #define SIZEBUFFER       4096
 #define RECEIVING        1
+#define CNTON_FLD        1
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR   (-1)
+#define SEND_ERROR     (-1)
+#define READ_ERROR     (-1)
+#define SRC_INV_ADDR     0
+#define AF_INV_ADDR    (-1)
 #define SUCESS           42
+#define ATTEMPTS         100
 #define ADDR_FAMILY      AF_INET     //Address Family
 #define BIND_LC_INTF     INADDR_ANY //Bind local interface
 #define NUM_MAX_HOST     NI_MAXHOST //Number max of hosts

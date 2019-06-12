@@ -1,4 +1,7 @@
 #include "client_socket.hpp"
+#include <chrono>
+
+using namespace std::chrono; // nanoseconds, system_clock, seconds
 
 Client_Socket::Client_Socket( void ){
   create_socket();
@@ -21,11 +24,12 @@ int Client_Socket::connect_socket( void ){
   return connect(this->listening, (struct sockaddr *)&this->server_address, sizeof(this->server_address));
 }
 
-void Client_Socket::send_data( void ){
+int Client_Socket::send_data( void ){
   this->message = "msg test";
-  send(this->listening , "msg tst" , strlen(this->message) , 0 );
+  return send(this->listening , "msg tst" , strlen(this->message) , 0 );
 }
 
 int Client_Socket::receive_data( void ){
-  return read(this->listening , this->buffer, 1024);
+  int check = read(this->listening , this->buffer, 1024);
+  return check;
 }
