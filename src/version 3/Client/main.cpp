@@ -3,7 +3,26 @@
 using std::cerr;
 using std::cout;
 
+void client_thread();
+
 int main(int argc, char const *argv[]) {
+  vector<std::thread> clientThreads;
+
+  for(int i = 0; i < NUM_MAX_CLIENT; i++){
+    cout << "PORT CLIENT: " << port_client << " CLIENT " << i << "\n";
+    clientThreads.push_back(std::thread(client_thread));
+    port_client++;
+  }
+
+  for (auto& clientThread : clientThreads) {
+		clientThread.join();
+	}
+
+  return 0;
+}
+
+void client_thread(){
+
   Client_Socket *client_socket = new Client_Socket();
 
   if(client_socket->create_socket() == INVALID_SOCKET){
@@ -23,7 +42,7 @@ int main(int argc, char const *argv[]) {
 
   check = client_socket->connect_socket();
 
-  if( check == CNTON_FLD ){
+  if( check == CONNECTION_FAILED ){
     cerr << ("ERROR: FAILED TO CONNECT\n");
     exit(EXIT_FAILURE);
   }
@@ -41,6 +60,4 @@ int main(int argc, char const *argv[]) {
 
   while((read_counter < ATTEMPTS) && ( client_socket->receive_data() == READ_ERROR ))
     read_counter++;
-
-  return 0;
 }

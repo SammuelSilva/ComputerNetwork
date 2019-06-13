@@ -1,49 +1,52 @@
 #include "service_socket.hpp"
+static int clientCounter = 0;
 
 Service_Socket::Service_Socket( void ){}
 
-int Service_Socket::create_socket( const int port ){
-  this->listening = socket(ADDR_FAMILY, SOCK_STREAM, IPPROTO_TCP); // IPV4, TCP, Protocolo
 
+bool Service_Socket::run_socket(const int port){
+  cout << "STARTING PORT:" << port << endl;
+  this->create_socket(port);
+
+  return this->listening_socket(port);
+}
+
+int Service_Socket::create_socket( const int port ){
   memset((char*) &this->address, '0', sizeof(this->address));
   this->address.sin_family      = ADDR_FAMILY;
   this->address.sin_port        = htons(port); //convere um u_short para a ordem de Byte do host da rede TCP/IP
   this->address.sin_addr.s_addr = BIND_LC_INTF; //Conectar a porta em qualquer endereço do socket
+  inet_pton(ADDR_FAMILY, "127.0.0.1", &this->address.sin_addr);
 
+  this->listening = socket(ADDR_FAMILY, SOCK_STREAM, IPPROTO_TCP); // IPV4, TCP, Protocolo
   bind(this->listening, (struct sockaddr*)&this->address, sizeof(this->address));
 
   return SUCESS;
-}
-
-bool Service_Socket::run_socket(const int port){
-
-  this->create_socket(port);
-
-  return this->listening_socket(port);
 }
 
 int Service_Socket::listening_socket ( const int port ){
 
   listen(this->listening, MAXCONECTION);
 
-  int clientCounter = 0;
   struct sockaddr_in clientAddress;
   socklen_t clientSize = sizeof(clientAddress);
   SOCKET clientSocket = INVALID_SOCKET;
 
   while(LISTENING){
     if(clientCounter == NUM_PORT && port == PORT){
-      std::cerr << "BREAKING" << '\n';
+      std::cerr << "BREAKING " << clientCounter << " " << port << '\n';
       break;
     }
-
     clientSocket = accept(this->listening, (struct sockaddr*)&clientAddress, &clientSize);
     if(clientSocket != INVALID_SOCKET){
+      clientCounter++;
+      cout << "CLIENT " << clientCounter << " CONNECT ON PORT: " << port <<  endl;
       thread clientThread (&Service_Socket::handle_connection, this, clientSocket);
       clientThread.detach();
     }
   }
   close_socket(clientSocket);
+
   return SUCESS;
 }
 
@@ -57,18 +60,20 @@ int Service_Socket::handle_connection( const int clientSocket ){
     if(bytes_rcv == SOCKET_ERROR)
       return FAILED;
     if(bytes_rcv == 0){
-      cout << "Cliente desconectado" << endl;
+      cout << "CLIENT DESCONNECTED" << endl;
       std::cout << "\nWAITING FOR CONNECTION. . .\n";
       break;
     }
-    std::cout << "Message: " << buffer << bytes_rcv << endl;
+    std::cout << "Message: " << buffer << endl;
     send(clientSocket, "Chegou", bytes_rcv+1, 0);    //Mensagem de volta para o cliente, com o \0
   }
+
   return SUCESS;
 }
 
 void Service_Socket::close_socket(const int& socket){
   close(socket);
+  clientCounter--;
 }
 
 //

@@ -15,7 +15,7 @@ int Client_Socket::create_socket( void ){
 int Client_Socket::initialize_socket( void ){
   memset((char*) &this->server_address, '0', sizeof(this->server_address));
   this->server_address.sin_family      = ADDR_FAMILY;
-  this->server_address.sin_port        = htons(PORT); //convere um u_short para a ordem de Byte do host da rede TCP/IP
+  this->server_address.sin_port        = htons(port_client); //convere um u_short para a ordem de Byte do host da rede TCP/IP
 
   return inet_pton(ADDR_FAMILY, "127.0.0.1", &this->server_address.sin_addr);
 }
@@ -25,8 +25,9 @@ int Client_Socket::connect_socket( void ){
 }
 
 int Client_Socket::send_data( void ){
-  this->message = "msg test";
-  return send(this->listening , "msg tst" , strlen(this->message) , 0 );
+  this->message = "CLIENT";
+  send(this->listening , this->message , strlen(this->message) , 0 );
+  return 1;
 }
 
 int Client_Socket::receive_data( void ){

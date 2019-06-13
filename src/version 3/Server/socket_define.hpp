@@ -25,9 +25,9 @@
 #define ADDR_FAMILY      AF_INET     //Address Family
 #define BIND_LC_INTF     INADDR_ANY //Bind local interface
 #define NUM_MAX_HOST     NI_MAXHOST //Number max of hosts
-#define NUM_MAX_SERV     NI_MAXSERV //Number max of service
+#define NUM_MAX_SERV     100 //NI_MAXSERV //Number max of service
 #define LISTENING        true
-#define NUM_PORT         22
+#define NUM_PORT         100
 
 using std::cin;
 using std::cout;
