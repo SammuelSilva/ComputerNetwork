@@ -1,5 +1,13 @@
 #include "service_socket.hpp"
-static int clientCounter = 0;
+#include<mutex>
+#include<string>
+
+
+std::mutex lock_variable;
+std::mutex lock_couter;
+std::recursive_mutex g_r_lock;
+int port_counter = 1;
+int clientID = 1;
 
 Service_Socket::Service_Socket( void ){}
 
@@ -31,17 +39,26 @@ int Service_Socket::listening_socket ( const int port ){
   struct sockaddr_in clientAddress;
   socklen_t clientSize = sizeof(clientAddress);
   SOCKET clientSocket = INVALID_SOCKET;
+  int clientCounter = 0;
 
   while(LISTENING){
-    if(clientCounter == NUM_PORT && port == PORT){
-      std::cerr << "BREAKING " << clientCounter << " " << port << '\n';
-      break;
+    if(clientCounter == MAXCONECTION / NUM_PORT && port != PORT){
+      std::cerr << "BREAKING: MAX CAPACITY " << '\n';
+	  std::chrono::milliseconds dura(2000);
+	  std::this_thread::sleep_for(dura);
     }
+
+	if (clientCounter == MAXCONECTION && port == PORT) {
+		std::cerr << "BREAKING: SOMETHING WRONG" << '\n';
+		std::chrono::milliseconds dura(2000);
+		std::this_thread::sleep_for(dura);
+	}
+
     clientSocket = accept(this->listening, (struct sockaddr*)&clientAddress, &clientSize);
     if(clientSocket != INVALID_SOCKET){
+	  cout << "ACEPTED CONECTION FROM CLIENT" << endl << endl;
       clientCounter++;
-      cout << "CLIENT " << clientCounter << " CONNECT ON PORT: " << port <<  endl;
-      thread clientThread (&Service_Socket::handle_connection, this, clientSocket);
+      thread clientThread (&Service_Socket::handle_connection, this, clientSocket, port);
       clientThread.detach();
     }
   }
@@ -50,10 +67,14 @@ int Service_Socket::listening_socket ( const int port ){
   return SUCESS;
 }
 
-int Service_Socket::handle_connection( const int clientSocket ){
+int Service_Socket::handle_connection( SOCKET clientSocket, int port){
+  if (port == PORT)
+	{
+		select_port(clientSocket,get_next_port(port)); //Seleciona uma porta nova sem que seja a base: 54000
+	}
+
   //While loop: aceitar e enviar a mensagem de volta para o cliente
   char buffer[SIZEBUFFER];
-  //authenticate(clientSocket);
   //Esperar o cliente enviar dados
   while(RECEIVING){
     int bytes_rcv = recv(clientSocket, buffer, SIZEBUFFER, 0);
@@ -61,33 +82,67 @@ int Service_Socket::handle_connection( const int clientSocket ){
       return FAILED;
     if(bytes_rcv == 0){
       cout << "CLIENT DESCONNECTED" << endl;
-      std::cout << "\nWAITING FOR CONNECTION. . .\n";
+	  std::cout << "MESSAGE: " << buffer << endl;
       break;
     }
-    std::cout << "Message: " << buffer << endl;
-    send(clientSocket, "Chegou", bytes_rcv+1, 0);    //Mensagem de volta para o cliente, com o \0
+	char* temp = "Chegou";
+    send(clientSocket, temp , strlen(temp), 0);    //Mensagem de volta para o cliente, com o \0
   }
-
   return SUCESS;
 }
 
-void Service_Socket::close_socket(const int& socket){
-  close(socket);
-  clientCounter--;
+void Service_Socket::select_port(SOCKET clientInstance,int port)
+{
+	char buffer[SIZEBUFFER];
+	int recvMsgSize;
+	int iResult;
+
+
+	recvMsgSize = recv(clientInstance, buffer, SIZEBUFFER, 0);
+	if (recvMsgSize < 0){
+		std::cerr << "RECEIVED FAILED\n";
+	}
+
+	sleep(1);
+	iResult = shutdown(clientInstance, SHUT_RD);
+	if (iResult == SOCKET_ERROR) {
+		std::cerr << "ERRO SOCKET 1 IN PORT SELECTION \n";
+		close(clientInstance);
+	}
+	std::string portS = std::to_string(port);
+
+	iResult = send(clientInstance, portS.c_str(), (int)portS.size(), 0);
+	if (iResult == SOCKET_ERROR) {
+    std::cerr << "ERRO SOCKET 2 IN PORT SELECTION \n";
+		close(clientInstance);
+	}
+	//Encerra a conexão ja que nao ira transmitir mais dados
+	iResult = shutdown(clientInstance, SHUT_WR);
+	if (iResult == SOCKET_ERROR) {
+    std::cerr << "ERRO SOCKET 3 IN PORT SELECTION \n";
+		close(clientInstance);
+	}
+
+	iResult = close(clientInstance); //Fecha o Socket
+	if (iResult == SOCKET_ERROR) {
+    std::cerr << "ERRO SOCKET 4 IN PORT SELECTION \n";
+	}
+
+  cout << "CLIENT " << clientID++ << " CONNECT ON PORT: " << port <<  endl;
+
 }
 
-//
-// void Service_Socket::generate_name( void ){
-//   //Seta os primeiros numeros de bytes de um ponteiro de um bloco de memoria para um valor especifico (Unsigned char), neste caso esta setando 0 NI_MAXHOST
-//   memset(this->host, '0', NUM_MAX_HOST);
-//   memset(this->service, '0', NUM_MAX_SERV);
-//
-//   //Verifica se consegue o nome do host que esta conectado se nao der, usamos o ip_address
-//
-//   if(getnameinfo((sockaddr*)&this->client, sizeof(this->client), this->host, NUM_MAX_HOST, this->service, NUM_MAX_SERV, 0) == 0){
-//     cout << this->host << " conectado na porta: " << this->service << endl; // possivel nome
-//   }else{
-//     inet_ntop(ADDR_FAMILY,&this->client.sin_addr, this->host, NUM_MAX_HOST); //Gera o endereco IP da porta
-//     cout << this->host << "conectado na porta " << ntohs(this->client.sin_port) << endl;
-//   }
-// }
+int Service_Socket::get_next_port(int port){
+  std::lock_guard<std::mutex> lock(lock_variable); //Permite mudar o dado de uma variavel somente em uma thread bloqueando o acesso a seção critica da memoria.
+	port += port_counter;
+  port_counter++;
+	if (port_counter == NUM_PORT)
+		port_counter = 1;
+
+	return port;
+}
+
+void Service_Socket::close_socket(const SOCKET& socket){ //Fecha o Socket
+  close(socket);
+}
+

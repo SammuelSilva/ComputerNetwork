@@ -6,17 +6,14 @@ bool run_socket(int port);
 int main(int argc, char const *argv[]) {
   vector<thread> portThreads;
 
-	for (int i = 0; i <= NUM_PORT; i++)
-	{
+	for (int i = 0; i <= NUM_PORT; i++) {
 		portThreads.push_back(std::thread(run_socket, PORT + i));//create one thread per one port
-  }
+	}
 
-  int cont = 0;
+	cout << endl;
 	for (auto& portThread : portThreads) {
-    if(portThread.joinable())
+		if(portThread.joinable())
 		  portThread.join();
-
-    cont++;
 	}
 
   return 0;

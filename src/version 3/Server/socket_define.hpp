@@ -15,7 +15,7 @@
 #include <vector>
 
 #define PORT             54000
-#define MAXCONECTION     SOMAXCONN // SOMAXCONN: Numero maximo de conexões
+#define MAXCONECTION     48 // SOMAXCONN: Numero maximo de conexões
 #define SIZEBUFFER       4096
 #define RECEIVING        1
 #define INVALID_SOCKET (-1)
@@ -25,9 +25,10 @@
 #define ADDR_FAMILY      AF_INET     //Address Family
 #define BIND_LC_INTF     INADDR_ANY //Bind local interface
 #define NUM_MAX_HOST     NI_MAXHOST //Number max of hosts
-#define NUM_MAX_SERV     100 //NI_MAXSERV //Number max of service
+#define NUM_MAX_SERV     NI_MAXSERV //Number max of clients serv
 #define LISTENING        true
-#define NUM_PORT         100
+#define NUM_PORT         5
+#define SIZEBUFFER       4096
 
 using std::cin;
 using std::cout;
