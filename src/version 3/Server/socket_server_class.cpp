@@ -1,4 +1,5 @@
 #include "service_socket.hpp"
+#include "Casamento.hpp"
 #include<mutex>
 #include<string>
 
@@ -81,12 +82,18 @@ int Service_Socket::handle_connection( SOCKET clientSocket, int port){
     if(bytes_rcv == SOCKET_ERROR)
       return FAILED;
     if(bytes_rcv == 0){
-      cout << "CLIENT DESCONNECTED" << endl;
-	  std::cout << "MESSAGE: " << buffer << endl;
+		if (Boyer_Moore(buffer)) {
+			char* temp = "FIND";
+			send(clientSocket, temp, strlen(temp), 0);    //Mensagem de volta para o cliente, com o \0
+		}
+		else {
+			char* temp = "NOT FIND";
+			send(clientSocket, temp, strlen(temp), 0);    //Mensagem de volta para o cliente, com o \0
+		}
+		cout << "CLIENT DESCONNECTED" << endl;
+	 // std::cout << "MESSAGE: " << buffer << endl;
       break;
     }
-	char* temp = "Chegou";
-    send(clientSocket, temp , strlen(temp), 0);    //Mensagem de volta para o cliente, com o \0
   }
   return SUCESS;
 }
