@@ -74,7 +74,6 @@ int Service_Socket::handle_connection( int port){
 
   //Esperar o cliente enviar dados
   while((bytes_rcv = recvfrom(sockfd, buffer, SIZEBUFFER, 0, (struct sockaddr*) & client, &client_size))){
-	  cout << buffer << endl;
 
 	if(bytes_rcv == SOCKET_ERROR)
       return FAILED;
@@ -117,7 +116,7 @@ void Service_Socket::select_port(int port)
 		//close(clientInstance);
 	}
 	
-  cout << "CLIENT " << clientID++ << " CONNECT ON PORT: " << port << " " << buffer <<  endl;
+  cout << "CLIENT " << clientID++ << " CONNECT ON PORT: " << port  <<  endl;
 }
 
 int Service_Socket::get_next_port(int port){
