@@ -17,7 +17,6 @@ public:
   virtual ~Client_Socket(){};
   virtual int create_socket( void );
   virtual int initialize_socket( int );
-  virtual int connect_socket( void );
   virtual int send_data( void );
   virtual int receive_data( void );
   virtual int check_data(void);
