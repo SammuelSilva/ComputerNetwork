@@ -23,10 +23,6 @@ int Client_Socket::initialize_socket( int port_client ){
   return inet_pton(ADDR_FAMILY, "127.0.0.1", &server_address.sin_addr);
 }
 
-int Client_Socket::connect_socket( void ){
-  return connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address));
-}
-
 int Client_Socket::send_data( void ){
   int position = (rand() % 10);
 
@@ -75,7 +71,6 @@ int Client_Socket::receive_data( void ){
 }
 
 int Client_Socket::check_data() {
-	cout << "buffer: " << buffer << endl;
 	if ((strcmp(buffer, "FIND") != 0) && (strcmp(buffer, "NOT FIND") != 0)) {
 		try {
 			int temp = std::stoi(buffer);
